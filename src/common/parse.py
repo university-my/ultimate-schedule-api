@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from src.common.errors import ParsingError
 
 base_lesson = namedtuple("Base", ["date", "verb", "lessons"])
-lesson = namedtuple("Lesson", ["number", "start", "stop", "description"])
+lesson = namedtuple("Lesson", ["number", "start", "stop", "description", "html"])
 
 
 def serialize(data):
@@ -19,6 +19,7 @@ def serialize(data):
                     "from": single.start,
                     "to": single.stop,
                     "description": single.description,
+                    "html": single.html
                 }
             )
         schedule.append(payload)
@@ -34,9 +35,10 @@ def collect(containers):
         for each_tr in container.find_all("tr"):
             row = each_tr.find_all("td")
             if row[-1].get_text(strip=True):
+                html = row[2].encode()
                 description = row[2].text.replace("\xa0", " ")
                 lesson_time = row[1].text[:5], row[1].text[5:]
-                lessons.append(lesson(row[0].text, *lesson_time, description))
+                lessons.append(lesson(row[0].text, *lesson_time, description, html))
         result.append(base_lesson(*date, lessons))
     return serialize(result)
 
