@@ -31,7 +31,14 @@ def collect(containers):
     result = []
     for container in containers:
         lessons = []
-        date = container.h4.text.split()
+
+        # `date` should contains array like this `['29.03.2021', 'Понеділок']`
+        # But sometimes `h4` tag may contains more data
+        # So I'm getting first two elements from `h4`
+        # It works for now :)
+        date_and_day = container.h4.text.split()
+        date = [date_and_day[0], date_and_day[1]]
+
         for each_tr in container.find_all("tr"):
             row = each_tr.find_all("td")
             if row[-1].get_text(strip=True):
